@@ -1,12 +1,35 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { SiteHeader } from "@/components/SiteHeader";
+import { HeroSection } from "@/components/HeroSection";
+import { FeaturesSection } from "@/components/FeaturesSection";
+import { AISection } from "@/components/AISection";
+import { ComparisonSection } from "@/components/ComparisonSection";
+import { USPSection } from "@/components/USPSection";
+import { UseCasesSection } from "@/components/UseCasesSection";
+import { ImpactSection } from "@/components/ImpactSection";
+import { TechSection } from "@/components/TechSection";
+import { FeedbackSection } from "@/components/FeedbackSection";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <HeroSection />
+      <FeaturesSection />
+      <div id="ai">
+        <AISection />
       </div>
+      <ComparisonSection />
+      <USPSection />
+      <div id="usecases">
+        <UseCasesSection />
+      </div>
+      <div id="impact">
+        <ImpactSection />
+      </div>
+      <TechSection />
+      <FeedbackSection />
+      <Footer />
     </div>
   );
 };
