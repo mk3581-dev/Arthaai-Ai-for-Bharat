@@ -5,9 +5,10 @@ import { useNavigate } from "react-router-dom";
 
 interface ChatHeaderProps {
   onNewChat?: () => void;
+  isDemoMode?: boolean;
 }
 
-export const ChatHeader = ({ onNewChat }: ChatHeaderProps) => {
+export const ChatHeader = ({ onNewChat, isDemoMode }: ChatHeaderProps) => {
   const navigate = useNavigate();
 
   return (
@@ -22,7 +23,14 @@ export const ChatHeader = ({ onNewChat }: ChatHeaderProps) => {
             <Shield className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <span className="font-display text-xl font-semibold text-foreground">ArthaAI</span>
+            <div className="flex items-center gap-2">
+              <span className="font-display text-xl font-semibold text-foreground">ArthaAI</span>
+              {isDemoMode && (
+                <span className="rounded-full bg-amber-100 text-amber-800 text-[10px] font-semibold px-2 py-1">
+                  Demo mode
+                </span>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground">Your Personal AI Chartered Accountant</p>
           </div>
         </div>

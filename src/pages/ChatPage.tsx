@@ -9,6 +9,8 @@ const ChatPage = () => {
   const { messages, isLoading, sendMessage, clearChat } = useArthaChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const isDemoMode = !import.meta.env.VITE_OPENAI_API_KEY;
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -25,7 +27,7 @@ const ChatPage = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <ChatHeader onNewChat={hasMessages ? clearChat : undefined} />
+      <ChatHeader onNewChat={hasMessages ? clearChat : undefined} isDemoMode={isDemoMode} />
 
       <main className="flex-1 flex flex-col overflow-hidden">
         {!hasMessages ? (
