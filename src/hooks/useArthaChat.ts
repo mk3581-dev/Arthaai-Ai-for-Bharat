@@ -62,12 +62,15 @@ export const useArthaChat = () => {
       const assistantMsg: Message = { role: "assistant", content: assistantText };
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (error) {
-      console.error("ArthaAI error", error);
-      toast.error("AI request failed. Check your network or AI backend.");
+      const message =
+        error instanceof Error
+          ? `${error.message}`
+          : "Unknown error when calling AI backend.";
+      console.error("ArthaAI error", message);
+      toast.error(`AI request failed: ${message}`);
       const errorMsg: Message = {
         role: "assistant",
-        content:
-          "Sorry, I couldn't reach the AI service. Please check your network and ensure the backend is running.",
+        content: `Sorry, I couldn't reach the AI service at ${apiUrl}.\n\nReason: ${message}`,
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
