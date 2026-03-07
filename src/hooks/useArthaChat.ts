@@ -22,64 +22,52 @@ export const useArthaChat = () => {
 
     setIsLoading(true);
 
-    const openAIKey = import.meta.env.VITE_OPENAI_API_KEY;
-    const model = import.meta.env.VITE_OPENAI_MODEL || "gpt-3.5-turbo";
-
-    // If the OpenAI key isn't configured, fall back to the demo response.
-    if (!openAIKey) {
-      setTimeout(() => {
-        const demoResponse: Message = {
-          role: "assistant",
-          content: `📋 UNDERSTANDING\nYou asked: "${input}"\n\n📊 FACTS & CONTEXT\nArthaAI is designed to provide financial education and guidance for Indian citizens. I can help with banking basics, tax queries, scam detection, investment education, and more.\n\n💡 RECOMMENDATION\nThis is a demo mode. To get full AI-powered responses, please provide a valid OpenAI API key in a .env file (VITE_OPENAI_API_KEY).\n\n✅ In the meantime, explore the homepage to learn about all ArthaAI features!`,
-        };
-        setMessages((prev) => [...prev, demoResponse]);
-        setIsLoading(false);
-      }, 1500);
-      return;
-    }
+    const apiUrl =
+      import.meta.env.VITE_ARTHA_CHAT_URL ||
+      "https://twukwwvxkzzqzneyyxvu.supabase.co/functions/v1/artha-chat";
 
     try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${openAIKey}`,
         },
-        body: JSON.stringify({
-          model,
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are ArthaAI, a friendly financial education assistant designed to help users understand banking, taxes, investments, and fraud prevention. Provide your answers in a clear, concise, and helpful manner.",
-            },
-            ...conversation,
-          ],
-          temperature: 0.7,
-        }),
+        body: JSON.stringify({ messages: conversation }),
       });
 
       if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`OpenAI responded with ${response.status}: ${errText}`);
+        let message = `API responded with ${response.status}`;
+        try {
+          const json = JSON.parse(errText);
+          message = json.error || json.message || message;
+        } catch {
+          // ignore
+        }
+        throw new Error(message);
       }
 
       const data = await response.json();
-      const assistantText = data?.choices?.[0]?.message?.content?.trim();
+      const assistantText =
+        data?.choices?.[0]?.message?.content?.trim() ||
+        data?.answer ||
+        data?.text ||
+        data?.message ||
+        "";
 
       if (!assistantText) {
-        throw new Error("No response from OpenAI.");
+        throw new Error("No response from AI.");
       }
 
       const assistantMsg: Message = { role: "assistant", content: assistantText };
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (error) {
       console.error("ArthaAI error", error);
-      toast.error("AI request failed. Check your OpenAI key and network.");
+      toast.error("AI request failed. Check your network or AI backend.");
       const errorMsg: Message = {
         role: "assistant",
         content:
-          "Sorry, I couldn't reach the AI service. Please check your OpenAI API key and try again.",
+          "Sorry, I couldn't reach the AI service. Please check your network and ensure the backend is running.",
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
