@@ -22,44 +22,66 @@ export const useArthaChat = () => {
 
     setIsLoading(true);
 
-    const apiUrl =
+    const openAIKey = import.meta.env.VITE_OPENAI_API_KEY;
+    const openAIModel = import.meta.env.VITE_OPENAI_MODEL || "gpt-3.5-turbo";
+    const arthaUrl =
       import.meta.env.VITE_ARTHA_CHAT_URL ||
       "https://twukwwvxkzzqzneyyxvu.supabase.co/functions/v1/artha-chat";
 
+    const useOpenAI = Boolean(openAIKey);
+    const useBackend = !useOpenAI;
+    const endpoint = useOpenAI ? "OpenAI" : "Artha backend";
+    const targetUrl = useOpenAI ? "https://api.openai.com/v1/chat/completions" : arthaUrl;
+
     try {
-      const response = await fetch(apiUrl, {
+      const response = await fetch(targetUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(useOpenAI ? { Authorization: `Bearer ${openAIKey}` } : {}),
         },
-        body: JSON.stringify({ messages: conversation }),
+        body: JSON.stringify(
+          useOpenAI
+            ? {
+                model: openAIModel,
+                messages: [
+                  {
+                    role: "system",
+                    content:
+                      "You are ArthaAI, a friendly financial education assistant designed to help users understand banking, taxes, investments, and fraud prevention. Provide your answers in a clear, concise, and helpful manner.",
+                  },
+                  ...conversation,
+                ],
+                temperature: 0.7,
+              }
+            : { messages: conversation }
+        ),
       });
 
       if (!response.ok) {
         const errText = await response.text();
-        let message = `API responded with ${response.status}`;
+        let message = `Response ${response.status}`;
         try {
           const json = JSON.parse(errText);
           message = json.error || json.message || message;
         } catch {
-          // ignore
+          // ignore parsing errors
         }
         throw new Error(message);
       }
 
       const data = await response.json();
       const assistantText =
-        data?.choices?.[0]?.message?.content?.trim() ||
-        data?.answer ||
-        data?.text ||
-        data?.message ||
+        (useOpenAI
+          ? data?.choices?.[0]?.message?.content
+          : data?.choices?.[0]?.message?.content || data?.answer || data?.text || data?.message) ??
         "";
 
-      if (!assistantText) {
+      if (!assistantText?.trim()) {
         throw new Error("No response from AI.");
       }
 
-      const assistantMsg: Message = { role: "assistant", content: assistantText };
+      const assistantMsg: Message = { role: "assistant", content: assistantText.trim() };
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (error) {
       const message =
@@ -67,10 +89,10 @@ export const useArthaChat = () => {
           ? `${error.message}`
           : "Unknown error when calling AI backend.";
       console.error("ArthaAI error", message);
-      toast.error(`AI request failed: ${message}`);
+      toast.error(`AI request failed (${endpoint}): ${message}`);
       const errorMsg: Message = {
         role: "assistant",
-        content: `Sorry, I couldn't reach the AI service at ${apiUrl}.\n\nReason: ${message}`,
+        content: `Sorry, I couldn't reach the AI service (${endpoint}).\n\nReason: ${message}`,
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {

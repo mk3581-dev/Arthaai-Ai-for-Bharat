@@ -3,12 +3,14 @@ import { Shield, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
+type ChatHeaderMode = "demo" | "openai" | "backend";
+
 interface ChatHeaderProps {
   onNewChat?: () => void;
-  isDemoMode?: boolean;
+  mode?: ChatHeaderMode;
 }
 
-export const ChatHeader = ({ onNewChat, isDemoMode }: ChatHeaderProps) => {
+export const ChatHeader = ({ onNewChat, mode = "demo" }: ChatHeaderProps) => {
   const navigate = useNavigate();
 
   return (
@@ -25,9 +27,17 @@ export const ChatHeader = ({ onNewChat, isDemoMode }: ChatHeaderProps) => {
           <div>
             <div className="flex items-center gap-2">
               <span className="font-display text-xl font-semibold text-foreground">ArthaAI</span>
-              {isDemoMode && (
+              {mode === "demo" ? (
                 <span className="rounded-full bg-amber-100 text-amber-800 text-[10px] font-semibold px-2 py-1">
                   Demo mode
+                </span>
+              ) : mode === "openai" ? (
+                <span className="rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-semibold px-2 py-1">
+                  OpenAI mode
+                </span>
+              ) : (
+                <span className="rounded-full bg-sky-100 text-sky-800 text-[10px] font-semibold px-2 py-1">
+                  Backend mode
                 </span>
               )}
             </div>
