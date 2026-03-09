@@ -9,13 +9,6 @@ const ChatPage = () => {
   const { messages, isLoading, sendMessage, clearChat } = useArthaChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const openAIKey = import.meta.env.VITE_OPENAI_API_KEY;
-  const arthaUrl =
-    import.meta.env.VITE_ARTHA_CHAT_URL ||
-    "https://twukwwvxkzzqzneyyxvu.supabase.co/functions/v1/artha-chat";
-
-  const isDemoMode = !openAIKey && !arthaUrl;
-  const isUsingOpenAI = Boolean(openAIKey);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -33,10 +26,7 @@ const ChatPage = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <ChatHeader
-        onNewChat={hasMessages ? clearChat : undefined}
-        mode={isDemoMode ? "demo" : isUsingOpenAI ? "openai" : "backend"}
-      />
+      <ChatHeader onNewChat={hasMessages ? clearChat : undefined} />
 
       <main className="flex-1 flex flex-col overflow-hidden">
         {!hasMessages ? (
