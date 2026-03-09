@@ -28,7 +28,7 @@ const ChatPage = () => {
     <div className="flex flex-col h-screen bg-background">
       <ChatHeader
         onNewChat={hasMessages ? clearChat : undefined}
-        mode={isDemoMode ? "demo" : isUsingOpenAI ? "openai" : "backend"}
+      />
       />
 
       <main className="flex-1 flex flex-col overflow-hidden">
