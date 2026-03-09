@@ -26,10 +26,7 @@ const ChatPage = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <ChatHeader
-        onNewChat={hasMessages ? clearChat : undefined}
-      />
-      />
+      <ChatHeader onNewChat={hasMessages ? clearChat : undefined} />
 
       <main className="flex-1 flex flex-col overflow-hidden">
         {!hasMessages ? (
